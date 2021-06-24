@@ -1,4 +1,4 @@
-import express, { response } from "express";
+import express from "express";
 import pdf from "html-pdf";
 import ejs from "ejs";
 
@@ -8,7 +8,7 @@ app.use(express.json());
 app.get("/", (req, res) => {
   ejs.renderFile(
     "./templates/index.ejs",
-    { name: "Barones = Render PDF" },
+    { name: "Render PDF" },
     (err, html) => {
       if (err) {
         return res.status(500).json({ message: "Server Error." });
@@ -16,6 +16,7 @@ app.get("/", (req, res) => {
 
       const options = {
         format: "A4",
+
         border: {
           right: "8",
         },
@@ -23,11 +24,12 @@ app.get("/", (req, res) => {
 
       pdf
         .create(html, options)
-        .toFile("./uploads/report.pdf", (error, response) => {
-          if (!error) {
-            return res.json({ message: "PDF Generation: OK" });
-          } else {
-            return res.json({ message: "Failed!" });
+        .toFile("./uploads/receipt.pdf", (error, response) => {
+          try {
+            return res.status(200).json({ message: "PDF Generation: OK" });
+          } catch (err) {
+            return res.status(500).json({ message: "Failed!" });
+            console.log(err);
           }
         });
     }
